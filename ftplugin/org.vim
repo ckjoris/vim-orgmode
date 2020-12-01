@@ -6,21 +6,21 @@
 " @Revision     : 0.4
 " vi: ft=vim:tw=80:sw=4:ts=4:fdm=marker
 
-if v:version > 702
-	if has('python3')
-		let s:py_version = 'python3 '
-		let s:py_env = 'python3 << EOF'
-	elseif has('python')
-		let s:py_version = 'python '
-		let s:py_env = 'python << EOF'
-	else
-		echoerr "Unable to start orgmode. Orgmode depends on Vim >= 7.3 with Python support complied in."
-		finish
-	endif
-else
-	echoerr "Unable to start orgmode. Orgmode depends on Vim >= 7.3 with Python support complied in."
-	finish
-endif
+" if v:version > 702
+" 	if has('python3')
+" 		let s:py_version = 'python3 '
+" 		let s:py_env = 'python3 << EOF'
+" 	elseif has('python')
+" 		let s:py_version = 'python '
+" 		let s:py_env = 'python << EOF'
+" 	else
+" 		echoerr "Unable to start orgmode. Orgmode depends on Vim >= 7.3 with Python support complied in."
+" 		finish
+" 	endif
+" else
+" 	echoerr "Unable to start orgmode. Orgmode depends on Vim >= 7.3 with Python support complied in."
+" 	finish
+" endif
 
 " Init buffer for file {{{1
 if ! exists('b:did_ftplugin')
@@ -44,9 +44,9 @@ if ! exists('b:did_ftplugin')
 	setlocal matchpairs+=<:>
 
 	" register keybindings if they don't have been registered before
-	if exists("g:loaded_org")
-		exe s:py_version . 'ORGMODE.register_keybindings()'
-	endif
+	" if exists("g:loaded_org")
+	" 	exe s:py_version . 'ORGMODE.register_keybindings()'
+	" endif
 endif
 
 " Load orgmode just once {{{1
@@ -80,89 +80,89 @@ if ! exists('g:org_prefer_insert_mode') && ! exists('b:org_prefer_insert_mode')
 endif
 
 " Menu and document handling {{{1
-function! <SID>OrgRegisterMenu()
-	exe s:py_version . 'ORGMODE.register_menu()'
-endfunction
-
-function! <SID>OrgUnregisterMenu()
-	exe s:py_version . 'ORGMODE.unregister_menu()'
-endfunction
-
-function! <SID>OrgDeleteUnusedDocument(bufnr)
-	exe s:py_env
-b = int(vim.eval('a:bufnr'))
-if b in ORGMODE._documents:
-	del ORGMODE._documents[b]
-EOF
-endfunction
+" function! <SID>OrgRegisterMenu()
+" 	exe s:py_version . 'ORGMODE.register_menu()'
+" endfunction
+"
+" function! <SID>OrgUnregisterMenu()
+" 	exe s:py_version . 'ORGMODE.unregister_menu()'
+" endfunction
+"
+" function! <SID>OrgDeleteUnusedDocument(bufnr)
+" 	exe s:py_env
+" b = int(vim.eval('a:bufnr'))
+" if b in ORGMODE._documents:
+" 	del ORGMODE._documents[b]
+" EOF
+" endfunction
 
 " show and hide Org menu depending on the filetype
-augroup orgmode
-	au BufEnter * :if &filetype == "org" | call <SID>OrgRegisterMenu() | endif
-	au BufLeave * :if &filetype == "org" | call <SID>OrgUnregisterMenu() | endif
-	au BufDelete * :call <SID>OrgDeleteUnusedDocument(expand('<abuf>'))
-augroup END
+" augroup orgmode
+" 	au BufEnter * :if &filetype == "org" | call <SID>OrgRegisterMenu() | endif
+" 	au BufLeave * :if &filetype == "org" | call <SID>OrgUnregisterMenu() | endif
+" 	au BufDelete * :call <SID>OrgDeleteUnusedDocument(expand('<abuf>'))
+" augroup END
 
 " Start orgmode {{{1
 " Expand our path
-exec s:py_env
-import vim, os, sys
-
-for p in vim.eval("&runtimepath").split(','):
-	dname = os.path.join(p, "ftplugin")
-	if os.path.exists(os.path.join(dname, "orgmode")):
-		if dname not in sys.path:
-			sys.path.append(dname)
-			break
-
-from orgmode._vim import ORGMODE, insert_at_cursor, get_user_input, date_to_str
-ORGMODE.start()
-
-from Date import Date
-import datetime
-EOF
-
-" 3rd Party Plugin Integration {{{1
-" * Repeat {{{2
-try
-	call repeat#set()
-catch
-endtry
-
-" * Tagbar {{{2
-let g:tagbar_type_org = {
-			\ 'ctagstype' : 'org',
-			\ 'kinds'     : [
-				\ 's:sections',
-				\ 'h:hyperlinks',
-			\ ],
-			\ 'sort'    : 0,
-			\ 'deffile' : expand('<sfile>:p:h') . '/org.cnf'
-			\ }
-
-" * Taglist {{{2
-if exists('g:Tlist_Ctags_Cmd')
-	" Pass parameters to taglist
-	let g:tlist_org_settings = 'org;s:section;h:hyperlinks'
-	let g:Tlist_Ctags_Cmd .= ' --options=' . expand('<sfile>:p:h') . '/org.cnf '
-endif
-
-" * Calendar.vim {{{2
-fun CalendarAction(day, month, year, week, dir)
-	exe s:py_version . "selected_date = " . printf("datetime.date(%d, %d, %d)", a:year, a:month, a:day)
-	exe s:py_version . "org_timestamp = '" . g:org_timestamp_template . "' % date_to_str(selected_date)"
-
-	" get_user_input
-	exe s:py_version . "modifier = get_user_input(org_timestamp)"
-	" change date according to user input
-	exe s:py_version . "newdate = Date._modify_time(selected_date, modifier)"
-	exe s:py_version . "newdate = date_to_str(newdate)"
-	" close Calendar
-	exe "q"
-	" goto previous window
-	exe "wincmd p"
-	exe s:py_version . "timestamp = '" . g:org_timestamp_template . "' % newdate"
-	exe s:py_version . "if modifier != None: insert_at_cursor(timestamp)"
-	" restore calendar_action
-	let g:calendar_action = g:org_calendar_action_backup
-endf
+"" exec s:py_env
+"" import vim, os, sys
+"" 
+"" for p in vim.eval("&runtimepath").split(','):
+"" 	dname = os.path.join(p, "ftplugin")
+"" 	if os.path.exists(os.path.join(dname, "orgmode")):
+"" 		if dname not in sys.path:
+"" 			sys.path.append(dname)
+"" 			break
+"" 
+"" from orgmode._vim import ORGMODE, insert_at_cursor, get_user_input, date_to_str
+"" ORGMODE.start()
+"" 
+"" from Date import Date
+"" import datetime
+"" EOF
+"" 
+"" " 3rd Party Plugin Integration {{{1
+"" " * Repeat {{{2
+"" try
+"" 	call repeat#set()
+"" catch
+"" endtry
+"" 
+"" " * Tagbar {{{2
+"" let g:tagbar_type_org = {
+"" 			\ 'ctagstype' : 'org',
+"" 			\ 'kinds'     : [
+"" 				\ 's:sections',
+"" 				\ 'h:hyperlinks',
+"" 			\ ],
+"" 			\ 'sort'    : 0,
+"" 			\ 'deffile' : expand('<sfile>:p:h') . '/org.cnf'
+"" 			\ }
+"" 
+"" " * Taglist {{{2
+"" if exists('g:Tlist_Ctags_Cmd')
+"" 	" Pass parameters to taglist
+"" 	let g:tlist_org_settings = 'org;s:section;h:hyperlinks'
+"" 	let g:Tlist_Ctags_Cmd .= ' --options=' . expand('<sfile>:p:h') . '/org.cnf '
+"" endif
+"" 
+"" " * Calendar.vim {{{2
+"" fun CalendarAction(day, month, year, week, dir)
+"" 	exe s:py_version . "selected_date = " . printf("datetime.date(%d, %d, %d)", a:year, a:month, a:day)
+"" 	exe s:py_version . "org_timestamp = '" . g:org_timestamp_template . "' % date_to_str(selected_date)"
+"" 
+"" 	" get_user_input
+"" 	exe s:py_version . "modifier = get_user_input(org_timestamp)"
+"" 	" change date according to user input
+"" 	exe s:py_version . "newdate = Date._modify_time(selected_date, modifier)"
+"" 	exe s:py_version . "newdate = date_to_str(newdate)"
+"" 	" close Calendar
+"" 	exe "q"
+"" 	" goto previous window
+"" 	exe "wincmd p"
+"" 	exe s:py_version . "timestamp = '" . g:org_timestamp_template . "' % newdate"
+"" 	exe s:py_version . "if modifier != None: insert_at_cursor(timestamp)"
+"" 	" restore calendar_action
+"" 	let g:calendar_action = g:org_calendar_action_backup
+"" endf

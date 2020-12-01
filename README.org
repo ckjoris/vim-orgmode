@@ -1,3 +1,7 @@
+my fork of vim-orgmode - deleted most python code, leaving just bare bones
+syntax highlighting, so it loads much faster and doesnt cause errors like the
+original repo.
+
 THIS REPOSITORY IS UNMAINTAINED! If you want to become the maintainer, please reach out!
 
 * Vim-OrgMode
